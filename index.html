@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>30 JavaScript Projects</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #00ffe7;
+    }
+
+    .project-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .project-card {
+      background: #1e1e1e;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,255,231,0.15);
+      transition: transform 0.2s;
+    }
+
+    .project-card:hover {
+      transform: scale(1.03);
+    }
+
+    .project-card a {
+      color: #00ffe7;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .project-card a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>30 - JavaScript Projects</h1>
+  <div class="project-list">
+    <div class="project-card"><a href="projects/01-weather-app/">01. Weather App</a></div>
+    <div class="project-card"><a href="projects/02-todo-list/">02. Todo List</a></div>
+    <div class="project-card"><a href="projects/03-quiz-app/">03. Quiz App</a></div>
+    <div class="project-card"><a href="projects/04-password-generator/">04. Password Generator</a></div>
+    <!-- Add more project cards here as you build them -->
+  </div>
+
+</body>
+</html>
