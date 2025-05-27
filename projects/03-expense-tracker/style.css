@@ -1,0 +1,86 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #222831;
+  color: #DFD0B8;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 700px;
+  margin: auto;
+  padding: 2rem;
+  background-color: #393E46;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+input, select, button {
+  padding: 10px;
+  margin: 5px 0;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  font-size: 1rem;
+}
+
+button {
+  background-color: #948979;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.filters, .budget-box {
+  margin: 1rem 0;
+}
+
+.progress-bar {
+  height: 20px;
+  background-color: #DFD0B8;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#progressFill {
+  height: 100%;
+  background-color: #948979;
+  width: 0%;
+  transition: width 0.3s;
+}
+
+ul#expenseList {
+  list-style: none;
+  padding: 0;
+}
+
+ul#expenseList li {
+  background-color: #222831;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border-left: 5px solid #948979;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.actions button {
+  margin-left: 5px;
+}
+
+#categoryTotals {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #222831;
+  border-radius: 10px;
+}
+
+canvas#expenseChart {
+  margin-top: 2rem;
+  background-color: #fff;
+  border-radius: 10px;
+}

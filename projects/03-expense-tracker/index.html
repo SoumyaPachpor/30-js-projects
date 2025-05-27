@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --accent: #4895ef;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #4cc9f0;
+      --warning: #f72585;
+      --danger: #7209b7;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7fa;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .card-title svg {
+      margin-right: 0.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--gray);
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--light-gray);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    button:hover {
+      background-color: var(--secondary);
+    }
+    
+    button svg {
+      margin-right: 0.5rem;
+    }
+    
+    .btn-danger {
+      background-color: var(--warning);
+    }
+    
+    .btn-danger:hover {
+      background-color: #d91a6a;
+    }
+    
+    .btn-edit {
+      background-color: var(--accent);
+    }
+    
+    .btn-edit:hover {
+      background-color: #3a7bc8;
+    }
+    
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .progress-container {
+      margin-top: 1rem;
+    }
+    
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .progress-bar {
+      height: 10px;
+      background-color: var(--light-gray);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    .expense-list {
+      list-style: none;
+    }
+    
+    .expense-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid var(--light-gray);
+      transition: background-color 0.3s;
+    }
+    
+    .expense-item:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .expense-details {
+      flex: 1;
+    }
+    
+    .expense-desc {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+    
+    .expense-meta {
+      display: flex;
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+    
+    .expense-meta span {
+      margin-right: 1rem;
+    }
+    
+    .expense-amount {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 0 1rem;
+      color: var(--primary);
+    }
+    
+    .expense-actions {
+      display: flex;
+    }
+    
+    .expense-actions button {
+      padding: 0.5rem;
+      margin-left: 0.5rem;
+    }
+    
+    .category-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: capitalize;
+    }
+    
+    .high {
+      background-color: rgba(242, 19, 93, 0.1);
+      color: var(--warning);
+    }
+    
+    .medium {
+      background-color: rgba(72, 149, 239, 0.1);
+      color: var(--accent);
+    }
+    
+    .low {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-top: 1rem;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .stat-card {
+      text-align: center;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+    
+    .total-spent {
+      background-color: rgba(242, 19, 93, 0.1);
+    }
+    
+    .budget-left {
+      background-color: rgba(76, 201, 240, 0.1);
+    }
+    
+    .expenses-count {
+      background-color: rgba(114, 9, 183, 0.1);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--gray);
+    }
+    
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Expense Tracker</h1>
+      <p>Track and manage your expenses efficiently</p>
+    </header>
+
+    <div class="dashboard">
+      <div class="left-panel">
+        <!-- Budget Card -->
+        <div class="card">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            Monthly Budget
+          </h2>
+          <div class="form-group">
+            <input type="number" id="budgetInput" placeholder="Enter your budget">
+          </div>
+          <button id="setBudgetBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            Set Budget
+          </button>
+          
+          <div class="progress-container">
+            <div class="progress-info">
+              <span id="spentAmount">₹0 spent</span>
+              <span id="budgetAmount">₹0 budget</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Expense Card -->
+        <div class="card">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add New Expense
+          </h2>
+          <form id="expenseForm">
+            <div class="form-group">
+              <label for="descInput">Description</label>
+              <input type="text" id="descInput" placeholder="What did you spend on?" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="amountInput">Amount</label>
+              <input type="number" id="amountInput" placeholder="₹0.00" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="dateInput">Date</label>
+              <input type="date" id="dateInput" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="categoryInput">Priority</label>
+              <select id="categoryInput" required>
+                <option value="high">High</option>
+                <option value="medium" selected>Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+            
+            <button type="submit">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              Add Expense
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <!-- Filters Card -->
+        <div class="card">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            Filters
+          </h2>
+          <div class="filters">
+            <div class="form-group">
+              <label for="searchInput">Search</label>
+              <input type="text" id="searchInput" placeholder="Search expenses...">
+            </div>
+            
+            <div class="form-group">
+              <label for="priorityFilter">Priority</label>
+              <select id="priorityFilter">
+                <option value="all">All Priorities</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="filters">
+            <div class="form-group">
+              <label for="monthFilter">Month</label>
+              <select id="monthFilter">
+                <option value="all">All Months</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="card">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="20" x2="12" y2="10"></line>
+              <line x1="18" y1="20" x2="18" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="16"></line>
+            </svg>
+            Overview
+          </h2>
+          <div class="stats-grid">
+            <div class="stat-card total-spent">
+              <div class="stat-value" id="totalSpent">₹0</div>
+              <div class="stat-label">Total Spent</div>
+            </div>
+            <div class="stat-card budget-left">
+              <div class="stat-value" id="budgetLeft">₹0</div>
+              <div class="stat-label">Budget Left</div>
+            </div>
+            <div class="stat-card expenses-count">
+              <div class="stat-value" id="expensesCount">0</div>
+              <div class="stat-label">Expenses</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expenses List Card -->
+        <div class="card">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            Recent Expenses
+          </h2>
+          
+          <ul class="expense-list" id="expenseList">
+            <!-- Expenses will be added here dynamically -->
+          </ul>
+          
+          <div class="empty-state" id="emptyState" style="display: none;">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3h18v18H3z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+              <line x1="18" y1="6" x2="18.01" y2="6"></line>
+              <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+            <h3>No expenses yet</h3>
+            <p>Add your first expense to get started</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Card -->
+    <div class="card">
+      <h2 class="card-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+          <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+        </svg>
+        Expense Breakdown
+      </h2>
+      <div class="chart-container">
+        <canvas id="expenseChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const expenseForm = document.getElementById("expenseForm");
+    const expenseList = document.getElementById("expenseList");
+    const budgetInput = document.getElementById("budgetInput");
+    const setBudgetBtn = document.getElementById("setBudgetBtn");
+    const spentAmount = document.getElementById("spentAmount");
+    const budgetAmount = document.getElementById("budgetAmount");
+    const progressFill = document.getElementById("progressFill");
+    const searchInput = document.getElementById("searchInput");
+    const priorityFilter = document.getElementById("priorityFilter");
+    const monthFilter = document.getElementById("monthFilter");
+    const expenseChart = document.getElementById("expenseChart").getContext("2d");
+    const emptyState = document.getElementById("emptyState");
+    const totalSpent = document.getElementById("totalSpent");
+    const budgetLeft = document.getElementById("budgetLeft");
+    const expensesCount = document.getElementById("expensesCount");
+
+    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    let budget = parseFloat(localStorage.getItem("budget")) || 0;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      if (budget > 0) {
+        budgetInput.value = budget;
+        updateBudgetDisplay();
+      }
+      showExpenses();
+    });
+
+    function saveExpenses() {
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+    }
+
+    function saveBudget() {
+      localStorage.setItem("budget", budget);
+    }
+
+    function updateBudgetDisplay() {
+      const total = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+      spentAmount.textContent = `₹${total.toLocaleString()} spent`;
+      budgetAmount.textContent = `₹${budget.toLocaleString()} budget`;
+      
+      const percent = budget > 0 ? (total / budget) * 100 : 0;
+      progressFill.style.width = `${Math.min(percent, 100)}%`;
+      
+      // Update stats
+      totalSpent.textContent = `₹${total.toLocaleString()}`;
+      budgetLeft.textContent = `₹${Math.max(0, budget - total).toLocaleString()}`;
+      expensesCount.textContent = expenses.length;
+    }
+
+    function populateMonthFilter() {
+      const months = new Set(expenses.map(e => {
+        const date = new Date(e.date);
+        return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+      }));
+      
+      monthFilter.innerHTML = '<option value="all">All Months</option>' +
+        [...months].sort((a, b) => {
+          // Sort months chronologically
+          const dateA = new Date(a);
+          const dateB = new Date(b);
+          return dateB - dateA;
+        }).map(m => `<option value="${m}">${m}</option>`).join('');
+    }
+
+    function updateChart() {
+      const totals = {};
+      expenses.forEach(e => {
+        totals[e.category] = (totals[e.category] || 0) + Number(e.amount);
+      });
+
+      if (window.pieChart) window.pieChart.destroy();
+      
+      if (Object.keys(totals).length > 0) {
+        window.pieChart = new Chart(expenseChart, {
+          type: "doughnut",
+          data: {
+            labels: Object.keys(totals).map(cat => cat.charAt(0).toUpperCase() + cat.slice(1)),
+            datasets: [{
+              data: Object.values(totals),
+              backgroundColor: [
+                'rgba(242, 19, 93, 0.7)',
+                'rgba(72, 149, 239, 0.7)',
+                'rgba(67, 97, 238, 0.7)'
+              ],
+              borderColor: [
+                'rgba(242, 19, 93, 1)',
+                'rgba(72, 149, 239, 1)',
+                'rgba(67, 97, 238, 1)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const label = context.label || '';
+                    const value = context.raw || 0;
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const percentage = Math.round((value / total) * 100);
+                    return `${label}: ₹${value} (${percentage}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function showExpenses() {
+      const search = searchInput.value.toLowerCase();
+      const priority = priorityFilter.value;
+      const selectedMonth = monthFilter.value;
+
+      expenseList.innerHTML = "";
+      
+      const filteredExpenses = expenses.filter(e => {
+        const matchSearch = e.desc.toLowerCase().includes(search);
+        const matchPriority = priority === "all" || e.category === priority;
+        const matchMonth = selectedMonth === "all" || 
+          new Date(e.date).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth;
+        return matchSearch && matchPriority && matchMonth;
+      });
+      
+      if (filteredExpenses.length === 0) {
+        emptyState.style.display = 'block';
+      } else {
+        emptyState.style.display = 'none';
+        filteredExpenses.forEach((e, i) => {
+          const li = document.createElement("li");
+          li.className = "expense-item";
+          
+          const date = new Date(e.date);
+          const formattedDate = date.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric',
+            year: 'numeric'
+          });
+          
+          li.innerHTML = `
+            <div class="expense-details">
+              <div class="expense-desc">${e.desc}</div>
+              <div class="expense-meta">
+                <span>${formattedDate}</span>
+                <span class="category-badge ${e.category}">${e.category}</span>
+              </div>
+            </div>
+            <div class="expense-amount">₹${parseFloat(e.amount).toLocaleString()}</div>
+            <div class="expense-actions">
+              <button class="btn-edit" onclick="editExpense(${i})">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
+              <button class="btn-danger" onclick="deleteExpense(${i})">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </button>
+            </div>
+          `;
+          expenseList.appendChild(li);
+        });
+      }
+      
+      updateBudgetDisplay();
+      updateChart();
+      populateMonthFilter();
+    }
+
+    function editExpense(index) {
+      const e = expenses[index];
+      document.getElementById("descInput").value = e.desc;
+      document.getElementById("amountInput").value = e.amount;
+      document.getElementById("dateInput").value = e.date;
+      document.getElementById("categoryInput").value = e.category;
+      deleteExpense(index);
+      
+      // Scroll to form
+      document.getElementById("descInput").focus();
+    }
+
+    function deleteExpense(index) {
+      if (confirm("Are you sure you want to delete this expense?")) {
+        expenses.splice(index, 1);
+        saveExpenses();
+        showExpenses();
+      }
+    }
+
+    // Form submission
+    expenseForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const desc = document.getElementById("descInput").value.trim();
+      const amount = parseFloat(document.getElementById("amountInput").value).toFixed(2);
+      const date = document.getElementById("dateInput").value;
+      const category = document.getElementById("categoryInput").value;
+      
+      if (!desc || isNaN(amount) || !date) {
+        alert("Please fill all fields correctly");
+        return;
+      }
+      
+      expenses.push({ 
+        desc, 
+        amount, 
+        date, 
+        category 
+      });
+      
+      saveExpenses();
+      expenseForm.reset();
+      showExpenses();
+    });
+
+    // Set budget
+    setBudgetBtn.addEventListener("click", () => {
+      const newBudget = parseFloat(budgetInput.value);
+      
+      if (isNaN(newBudget) || newBudget <= 0) {
+        alert("Please enter a valid budget amount");
+        return;
+      }
+      
+      budget = newBudget;
+      saveBudget();
+      updateBudgetDisplay();
+      alert("Budget updated successfully!");
+    });
+
+    // Event listeners for filters
+    searchInput.addEventListener("input", showExpenses);
+    priorityFilter.addEventListener("change", showExpenses);
+    monthFilter.addEventListener("change", showExpenses);
+
+    // Initialize date input with today's date
+    document.getElementById("dateInput").valueAsDate = new Date();
+  </script>
+</body>
+</html>
